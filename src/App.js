@@ -5,11 +5,12 @@ import HoldingArea from "./components/HoldingArea";
 import "./App.css";
 
 const App = () => {
-	const gridSize = 10;
+	const [gridWidth, setGridWidth] = useState(10);
+	const [gridHeight, setGridHeight] = useState(10);
 	const [grid, setGrid] = useState(
-		Array(gridSize)
+		Array(gridHeight)
 			.fill(null)
-			.map(() => Array(gridSize).fill(null))
+			.map(() => Array(gridWidth).fill(null))
 	);
 	const [words, setWords] = useState([]);
 	const [selectedWord, setSelectedWord] = useState(null);
@@ -34,9 +35,9 @@ const App = () => {
 			const newWords = [...words];
 			newWords[wordIndex].position = { row: rowIndex, col: cellIndex };
 
-			const newGrid = Array(gridSize)
+			const newGrid = Array(gridHeight)
 				.fill(null)
-				.map(() => Array(gridSize).fill(null));
+				.map(() => Array(gridWidth).fill(null));
 			newWords.forEach(({ word, orientation, position }) => {
 				if (position) {
 					for (let i = 0; i < word.length; i++) {
@@ -106,9 +107,9 @@ const App = () => {
 					return w;
 				});
 
-				const newGrid = Array(gridSize)
+				const newGrid = Array(gridHeight)
 					.fill(null)
-					.map(() => Array(gridSize).fill(null));
+					.map(() => Array(gridWidth).fill(null));
 				newWords.forEach(({ word, orientation, position }) => {
 					if (position) {
 						for (let i = 0; i < word.length; i++) {
@@ -137,9 +138,9 @@ const App = () => {
 	const handleDeleteWord = () => {
 		if (selectedWord) {
 			const newWords = words.filter((w) => w.word !== selectedWord.word);
-			const newGrid = Array(gridSize)
+			const newGrid = Array(gridHeight)
 				.fill(null)
-				.map(() => Array(gridSize).fill(null));
+				.map(() => Array(gridWidth).fill(null));
 			newWords.forEach(({ word, orientation, position }) => {
 				if (position) {
 					for (let i = 0; i < word.length; i++) {
@@ -158,8 +159,126 @@ const App = () => {
 		}
 	};
 
+	const handleIncreaseGridWidth = () => {
+		const newGridWidth = gridWidth + 1;
+		const newGrid = Array(gridHeight)
+			.fill(null)
+			.map(() => Array(newGridWidth).fill(null));
+
+		words.forEach(({ word, orientation, position }) => {
+			if (position) {
+				for (let i = 0; i < word.length; i++) {
+					if (orientation === "horizontal") {
+						newGrid[position.row][position.col + i] = word[i];
+					} else {
+						newGrid[position.row + i][position.col] = word[i];
+					}
+				}
+			}
+		});
+
+		setGridWidth(newGridWidth);
+		setGrid(newGrid);
+	};
+
+	const handleDecreaseGridWidth = () => {
+		if (gridWidth <= 1) return; // Prevent decreasing width below 1
+		const newGridWidth = gridWidth - 1;
+		const newGrid = Array(gridHeight)
+			.fill(null)
+			.map(() => Array(newGridWidth).fill(null));
+
+		const newWords = words.filter(({ word, orientation, position }) => {
+			if (!position) return true;
+
+			const fitsInGrid =
+				(orientation === "horizontal" &&
+					position.col + word.length <= newGridWidth) ||
+				(orientation === "vertical" &&
+					position.row + word.length <= gridHeight);
+
+			if (fitsInGrid) {
+				for (let i = 0; i < word.length; i++) {
+					if (orientation === "horizontal") {
+						newGrid[position.row][position.col + i] = word[i];
+					} else {
+						newGrid[position.row + i][position.col] = word[i];
+					}
+				}
+			}
+
+			return fitsInGrid;
+		});
+
+		setGridWidth(newGridWidth);
+		setGrid(newGrid);
+		setWords(newWords);
+	};
+
+	const handleIncreaseGridHeight = () => {
+		const newGridHeight = gridHeight + 1;
+		const newGrid = Array(newGridHeight)
+			.fill(null)
+			.map(() => Array(gridWidth).fill(null));
+
+		words.forEach(({ word, orientation, position }) => {
+			if (position) {
+				for (let i = 0; i < word.length; i++) {
+					if (orientation === "horizontal") {
+						newGrid[position.row][position.col + i] = word[i];
+					} else {
+						newGrid[position.row + i][position.col] = word[i];
+					}
+				}
+			}
+		});
+
+		setGridHeight(newGridHeight);
+		setGrid(newGrid);
+	};
+
+	const handleDecreaseGridHeight = () => {
+		if (gridHeight <= 1) return; // Prevent decreasing height below 1
+		const newGridHeight = gridHeight - 1;
+		const newGrid = Array(newGridHeight)
+			.fill(null)
+			.map(() => Array(gridWidth).fill(null));
+
+		const newWords = words.filter(({ word, orientation, position }) => {
+			if (!position) return true;
+
+			const fitsInGrid =
+				(orientation === "horizontal" &&
+					position.col + word.length <= gridWidth) ||
+				(orientation === "vertical" &&
+					position.row + word.length <= newGridHeight);
+
+			if (fitsInGrid) {
+				for (let i = 0; i < word.length; i++) {
+					if (orientation === "horizontal") {
+						newGrid[position.row][position.col + i] = word[i];
+					} else {
+						newGrid[position.row + i][position.col] = word[i];
+					}
+				}
+			}
+
+			return fitsInGrid;
+		});
+
+		setGridHeight(newGridHeight);
+		setGrid(newGrid);
+		setWords(newWords);
+	};
+
 	return (
 		<div className="app">
+			<div className="grid-size-controls">
+				<button onClick={handleIncreaseGridWidth}>Increase Grid Width</button>
+				<button onClick={handleDecreaseGridWidth}>Decrease Grid Width</button>
+				<button onClick={handleIncreaseGridHeight}>Increase Grid Height</button>
+				<button onClick={handleDecreaseGridHeight}>Decrease Grid Height</button>
+			</div>
 			<Grid
 				grid={grid}
 				onCellClick={handleGridCellClick}
