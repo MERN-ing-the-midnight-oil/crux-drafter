@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/crux-drafter/static/css/main.af57adbc.css",
+    "main.js": "/crux-drafter/static/js/main.2238689c.js",
+    "static/js/488.d5a27162.chunk.js": "/crux-drafter/static/js/488.d5a27162.chunk.js",
+    "index.html": "/crux-drafter/index.html",
+    "main.af57adbc.css.map": "/crux-drafter/static/css/main.af57adbc.css.map",
+    "main.2238689c.js.map": "/crux-drafter/static/js/main.2238689c.js.map",
+    "488.d5a27162.chunk.js.map": "/crux-drafter/static/js/488.d5a27162.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.af57adbc.css",
+    "static/js/main.2238689c.js"
+  ]
+}
