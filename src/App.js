@@ -402,7 +402,7 @@ const App = () => {
 						<Word
 							key={wordObj.word}
 							word={wordObj.word}
-							orientation={wordObj.orientation}
+							orientation="horizontal"
 							onSelectWord={() => handleSelectWord(wordObj)}
 							isSelected={selectedWord && selectedWord.word === wordObj.word}
 						/>
