@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Grid from "./components/Grid";
 import Word from "./components/Word";
 import HoldingArea from "./components/HoldingArea";
+import { translateGridState } from "./utils/gridUtils"; // Import the utility function
 import "./App.css";
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
 		startCol: 0,
 	});
 	const [manualEntries, setManualEntries] = useState([]);
+	const [visualGrid, setVisualGrid] = useState([]);
 
 	const handleSelectWord = (word) => {
 		console.log(`Selected word: ${word.word}`);
@@ -363,6 +365,12 @@ const App = () => {
 		});
 	};
 
+	const handleTranslateGrid = () => {
+		const translatedGrid = translateGridState(grid);
+		setVisualGrid(translatedGrid);
+		console.log(translatedGrid);
+	};
+
 	return (
 		<div className="app">
 			<div className="grid-size-controls">
@@ -414,6 +422,8 @@ const App = () => {
 					Delete Selected Word
 				</button>
 			</div>
+			<button onClick={handleTranslateGrid}>Translate Grid</button>
+			<pre>{JSON.stringify(visualGrid, null, 2)}</pre>
 		</div>
 	);
 };
