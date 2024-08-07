@@ -77,6 +77,56 @@ const App = () => {
 		}
 	};
 
+	const handleGridCellDoubleClick = (rowIndex, cellIndex) => {
+		if (grid[rowIndex][cellIndex]) {
+			const wordChar = grid[rowIndex][cellIndex];
+			const selectedGridWord = words.find(
+				(word) =>
+					word.word.includes(wordChar) &&
+					word.position &&
+					((word.orientation === "horizontal" &&
+						word.position.row === rowIndex &&
+						word.position.col <= cellIndex &&
+						word.position.col + word.word.length > cellIndex) ||
+						(word.orientation === "vertical" &&
+							word.position.col === cellIndex &&
+							word.position.row <= rowIndex &&
+							word.position.row + word.word.length > rowIndex))
+			);
+
+			if (selectedGridWord) {
+				console.log(`Toggling orientation for word: ${selectedGridWord.word}`);
+
+				const newWords = words.map((w) => {
+					if (w.word === selectedGridWord.word) {
+						const newOrientation =
+							w.orientation === "horizontal" ? "vertical" : "horizontal";
+						return { ...w, orientation: newOrientation };
+					}
+					return w;
+				});
+
+				const newGrid = Array(gridSize)
+					.fill(null)
+					.map(() => Array(gridSize).fill(null));
+				newWords.forEach(({ word, orientation, position }) => {
+					if (position) {
+						for (let i = 0; i < word.length; i++) {
+							if (orientation === "horizontal") {
+								newGrid[position.row][position.col + i] = word[i];
+							} else {
+								newGrid[position.row + i][position.col] = word[i];
+							}
+						}
+					}
+				});
+
+				setGrid(newGrid);
+				setWords(newWords);
+			}
+		}
+	};
+
 	const handleAddWord = (newWord) => {
 		setWords([
 			...words,
@@ -113,6 +163,7 @@ const App = () => {
 			<Grid
 				grid={grid}
 				onCellClick={handleGridCellClick}
+				onCellDoubleClick={handleGridCellDoubleClick}
 				selectedWord={selectedWord}
 			/>
 			<div className="holding-area-container">

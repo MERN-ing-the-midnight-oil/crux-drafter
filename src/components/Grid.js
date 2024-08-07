@@ -2,7 +2,7 @@
 import React from "react";
 import "./Grid.css";
 
-const Grid = ({ grid, onCellClick, selectedWord }) => {
+const Grid = ({ grid, onCellClick, onCellDoubleClick, selectedWord }) => {
 	return (
 		<div className="grid">
 			{grid.map((row, rowIndex) => (
@@ -32,7 +32,8 @@ const Grid = ({ grid, onCellClick, selectedWord }) => {
 							<div
 								key={cellIndex}
 								className={`grid-cell ${isSelected ? "selected" : ""}`}
-								onClick={() => onCellClick(rowIndex, cellIndex)}>
+								onClick={() => onCellClick(rowIndex, cellIndex)}
+								onDoubleClick={() => onCellDoubleClick(rowIndex, cellIndex)}>
 								{cell}
 							</div>
 						);
