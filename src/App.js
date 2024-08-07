@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState } from "react";
 import Grid from "./components/Grid";
 import Word from "./components/Word";
@@ -85,6 +84,30 @@ const App = () => {
 		]);
 	};
 
+	const handleDeleteWord = () => {
+		if (selectedWord) {
+			const newWords = words.filter((w) => w.word !== selectedWord.word);
+			const newGrid = Array(gridSize)
+				.fill(null)
+				.map(() => Array(gridSize).fill(null));
+			newWords.forEach(({ word, orientation, position }) => {
+				if (position) {
+					for (let i = 0; i < word.length; i++) {
+						if (orientation === "horizontal") {
+							newGrid[position.row][position.col + i] = word[i];
+						} else {
+							newGrid[position.row + i][position.col] = word[i];
+						}
+					}
+				}
+			});
+
+			setGrid(newGrid);
+			setWords(newWords);
+			setSelectedWord(null);
+		}
+	};
+
 	return (
 		<div className="app">
 			<Grid
@@ -105,6 +128,11 @@ const App = () => {
 						/>
 					))}
 				</div>
+				<button
+					onClick={handleDeleteWord}
+					disabled={!selectedWord}>
+					Delete Selected Word
+				</button>
 			</div>
 		</div>
 	);
