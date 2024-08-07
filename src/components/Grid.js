@@ -2,7 +2,24 @@
 import React from "react";
 import "./Grid.css";
 
-const Grid = ({ grid, onCellClick, onCellDoubleClick, selectedWord }) => {
+const Grid = ({
+	grid,
+	onCellClick,
+	onCellDoubleClick,
+	selectedWord,
+	editingCell,
+	onCellInput,
+	onCellBlur,
+}) => {
+	const handleKeyPress = (e, rowIndex, cellIndex) => {
+		if (e.key === "Enter") {
+			const value = e.target.value.toUpperCase();
+			if (/[A-Z]/.test(value) && value.length === 1) {
+				onCellInput(rowIndex, cellIndex, value);
+			}
+		}
+	};
+
 	return (
 		<div className="grid">
 			{grid.map((row, rowIndex) => (
@@ -11,6 +28,14 @@ const Grid = ({ grid, onCellClick, onCellDoubleClick, selectedWord }) => {
 					className="grid-row">
 					{row.map((cell, cellIndex) => {
 						let isSelected = false;
+						let isEditing = false;
+						if (
+							editingCell &&
+							editingCell.row === rowIndex &&
+							editingCell.col === cellIndex
+						) {
+							isEditing = true;
+						}
 						if (selectedWord && selectedWord.position) {
 							if (
 								selectedWord.orientation === "horizontal" &&
@@ -31,10 +56,28 @@ const Grid = ({ grid, onCellClick, onCellDoubleClick, selectedWord }) => {
 						return (
 							<div
 								key={cellIndex}
-								className={`grid-cell ${isSelected ? "selected" : ""}`}
+								className={`grid-cell ${isSelected ? "selected" : ""} ${
+									isEditing ? "editing" : ""
+								}`}
 								onClick={() => onCellClick(rowIndex, cellIndex)}
 								onDoubleClick={() => onCellDoubleClick(rowIndex, cellIndex)}>
-								{cell}
+								{isEditing ? (
+									<input
+										type="text"
+										maxLength="1"
+										onKeyDown={(e) => handleKeyPress(e, rowIndex, cellIndex)}
+										onBlur={(e) =>
+											onCellBlur(
+												rowIndex,
+												cellIndex,
+												e.target.value.toUpperCase()
+											)
+										}
+										autoFocus
+									/>
+								) : (
+									cell
+								)}
 							</div>
 						);
 					})}

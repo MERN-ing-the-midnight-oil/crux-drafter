@@ -15,8 +15,17 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  position: relative;
 }
 
 .grid-cell.selected {
   background-color: yellow; /* Highlight color for selected cells */
+}
+
+.grid-cell.editing input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  text-align: center;
+  font-size: 1em;
 }

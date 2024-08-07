@@ -14,6 +14,7 @@ const App = () => {
 	);
 	const [words, setWords] = useState([]);
 	const [selectedWord, setSelectedWord] = useState(null);
+	const [editingCell, setEditingCell] = useState(null);
 
 	const handleSelectWord = (word) => {
 		console.log(`Selected word: ${word.word}`);
@@ -74,7 +75,7 @@ const App = () => {
 				setSelectedWord(selectedGridWord);
 			}
 		} else {
-			console.error("No word selected.");
+			setEditingCell({ row: rowIndex, col: cellIndex });
 		}
 	};
 
@@ -271,6 +272,21 @@ const App = () => {
 		setWords(newWords);
 	};
 
+	const handleCellInput = (rowIndex, cellIndex, value) => {
+		const newGrid = [...grid];
+		newGrid[rowIndex][cellIndex] = value;
+		setGrid(newGrid);
+		setEditingCell(null);
+	};
+
+	const handleCellBlur = (rowIndex, cellIndex, value) => {
+		if (value) {
+			handleCellInput(rowIndex, cellIndex, value);
+		} else {
+			setEditingCell(null);
+		}
+	};
+
 	return (
 		<div className="app">
 			<div className="grid-size-controls">
@@ -284,6 +300,9 @@ const App = () => {
 				onCellClick={handleGridCellClick}
 				onCellDoubleClick={handleGridCellDoubleClick}
 				selectedWord={selectedWord}
+				editingCell={editingCell}
+				onCellInput={handleCellInput}
+				onCellBlur={handleCellBlur}
 			/>
 			<div className="holding-area-container">
 				<HoldingArea onAddWord={handleAddWord} />
