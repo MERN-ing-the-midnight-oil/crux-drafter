@@ -15,6 +15,13 @@ const App = () => {
 	const [words, setWords] = useState([]);
 	const [selectedWord, setSelectedWord] = useState(null);
 	const [editingCell, setEditingCell] = useState(null);
+	const [shadedRegion, setShadedRegion] = useState({
+		width: 3,
+		height: 3,
+		startRow: 0,
+		startCol: 0,
+	});
+	const [manualEntries, setManualEntries] = useState([]);
 
 	const handleSelectWord = (word) => {
 		console.log(`Selected word: ${word.word}`);
@@ -51,6 +58,10 @@ const App = () => {
 				}
 			});
 
+			manualEntries.forEach(({ row, col, value }) => {
+				newGrid[row][col] = value;
+			});
+
 			setGrid(newGrid);
 			setWords(newWords);
 			setSelectedWord(null);
@@ -73,6 +84,8 @@ const App = () => {
 			if (selectedGridWord) {
 				console.log(`Selected word from grid: ${selectedGridWord.word}`);
 				setSelectedWord(selectedGridWord);
+			} else {
+				setEditingCell({ row: rowIndex, col: cellIndex });
 			}
 		} else {
 			setEditingCell({ row: rowIndex, col: cellIndex });
@@ -123,6 +136,10 @@ const App = () => {
 					}
 				});
 
+				manualEntries.forEach(({ row, col, value }) => {
+					newGrid[row][col] = value;
+				});
+
 				setGrid(newGrid);
 				setWords(newWords);
 			}
@@ -154,6 +171,10 @@ const App = () => {
 				}
 			});
 
+			manualEntries.forEach(({ row, col, value }) => {
+				newGrid[row][col] = value;
+			});
+
 			setGrid(newGrid);
 			setWords(newWords);
 			setSelectedWord(null);
@@ -176,6 +197,10 @@ const App = () => {
 					}
 				}
 			}
+		});
+
+		manualEntries.forEach(({ row, col, value }) => {
+			newGrid[row][col] = value;
 		});
 
 		setGridWidth(newGridWidth);
@@ -211,6 +236,10 @@ const App = () => {
 			return fitsInGrid;
 		});
 
+		manualEntries.forEach(({ row, col, value }) => {
+			newGrid[row][col] = value;
+		});
+
 		setGridWidth(newGridWidth);
 		setGrid(newGrid);
 		setWords(newWords);
@@ -232,6 +261,10 @@ const App = () => {
 					}
 				}
 			}
+		});
+
+		manualEntries.forEach(({ row, col, value }) => {
+			newGrid[row][col] = value;
 		});
 
 		setGridHeight(newGridHeight);
@@ -267,6 +300,10 @@ const App = () => {
 			return fitsInGrid;
 		});
 
+		manualEntries.forEach(({ row, col, value }) => {
+			newGrid[row][col] = value;
+		});
+
 		setGridHeight(newGridHeight);
 		setGrid(newGrid);
 		setWords(newWords);
@@ -275,16 +312,55 @@ const App = () => {
 	const handleCellInput = (rowIndex, cellIndex, value) => {
 		const newGrid = [...grid];
 		newGrid[rowIndex][cellIndex] = value;
+
+		const newManualEntries = manualEntries.filter(
+			(entry) => entry.row !== rowIndex || entry.col !== cellIndex
+		);
+		if (value) {
+			newManualEntries.push({ row: rowIndex, col: cellIndex, value });
+		}
+
 		setGrid(newGrid);
+		setManualEntries(newManualEntries);
 		setEditingCell(null);
 	};
 
 	const handleCellBlur = (rowIndex, cellIndex, value) => {
-		if (value) {
-			handleCellInput(rowIndex, cellIndex, value);
-		} else {
-			setEditingCell(null);
-		}
+		handleCellInput(rowIndex, cellIndex, value);
+	};
+
+	const handleIncreaseShadedWidth = () => {
+		setShadedRegion({
+			...shadedRegion,
+			width: Math.min(
+				shadedRegion.width + 1,
+				gridWidth - shadedRegion.startCol
+			),
+		});
+	};
+
+	const handleDecreaseShadedWidth = () => {
+		setShadedRegion({
+			...shadedRegion,
+			width: Math.max(shadedRegion.width - 1, 1),
+		});
+	};
+
+	const handleIncreaseShadedHeight = () => {
+		setShadedRegion({
+			...shadedRegion,
+			height: Math.min(
+				shadedRegion.height + 1,
+				gridHeight - shadedRegion.startRow
+			),
+		});
+	};
+
+	const handleDecreaseShadedHeight = () => {
+		setShadedRegion({
+			...shadedRegion,
+			height: Math.max(shadedRegion.height - 1, 1),
+		});
 	};
 
 	return (
@@ -295,6 +371,20 @@ const App = () => {
 				<button onClick={handleIncreaseGridHeight}>Increase Grid Height</button>
 				<button onClick={handleDecreaseGridHeight}>Decrease Grid Height</button>
 			</div>
+			<div className="shaded-region-controls">
+				<button onClick={handleIncreaseShadedWidth}>
+					Increase Shaded Width
+				</button>
+				<button onClick={handleDecreaseShadedWidth}>
+					Decrease Shaded Width
+				</button>
+				<button onClick={handleIncreaseShadedHeight}>
+					Increase Shaded Height
+				</button>
+				<button onClick={handleDecreaseShadedHeight}>
+					Decrease Shaded Height
+				</button>
+			</div>
 			<Grid
 				grid={grid}
 				onCellClick={handleGridCellClick}
@@ -303,6 +393,7 @@ const App = () => {
 				editingCell={editingCell}
 				onCellInput={handleCellInput}
 				onCellBlur={handleCellBlur}
+				shadedRegion={shadedRegion}
 			/>
 			<div className="holding-area-container">
 				<HoldingArea onAddWord={handleAddWord} />

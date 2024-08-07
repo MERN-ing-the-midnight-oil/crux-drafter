@@ -10,6 +10,7 @@ const Grid = ({
 	editingCell,
 	onCellInput,
 	onCellBlur,
+	shadedRegion,
 }) => {
 	const handleKeyPress = (e, rowIndex, cellIndex) => {
 		if (e.key === "Enter") {
@@ -29,6 +30,7 @@ const Grid = ({
 					{row.map((cell, cellIndex) => {
 						let isSelected = false;
 						let isEditing = false;
+						let isShaded = false;
 						if (
 							editingCell &&
 							editingCell.row === rowIndex &&
@@ -53,12 +55,20 @@ const Grid = ({
 								isSelected = true;
 							}
 						}
+						if (
+							rowIndex >= shadedRegion.startRow &&
+							rowIndex < shadedRegion.startRow + shadedRegion.height &&
+							cellIndex >= shadedRegion.startCol &&
+							cellIndex < shadedRegion.startCol + shadedRegion.width
+						) {
+							isShaded = true;
+						}
 						return (
 							<div
 								key={cellIndex}
 								className={`grid-cell ${isSelected ? "selected" : ""} ${
 									isEditing ? "editing" : ""
-								}`}
+								} ${isShaded ? "shaded" : ""}`}
 								onClick={() => onCellClick(rowIndex, cellIndex)}
 								onDoubleClick={() => onCellDoubleClick(rowIndex, cellIndex)}>
 								{isEditing ? (
@@ -73,6 +83,7 @@ const Grid = ({
 												e.target.value.toUpperCase()
 											)
 										}
+										defaultValue={cell}
 										autoFocus
 									/>
 								) : (
