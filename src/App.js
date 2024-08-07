@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "./components/Grid";
 import Word from "./components/Word";
 import HoldingArea from "./components/HoldingArea";
-import { translateGridState } from "./utils/gridUtils"; // Import the utility function
+import { translateGridState } from "./utils/gridUtils";
 import "./App.css";
 
 const App = () => {
@@ -24,6 +24,12 @@ const App = () => {
 	});
 	const [manualEntries, setManualEntries] = useState([]);
 	const [visualGrid, setVisualGrid] = useState([]);
+	const [savedGrids, setSavedGrids] = useState({});
+
+	useEffect(() => {
+		const storedGrids = JSON.parse(localStorage.getItem("savedGrids")) || {};
+		setSavedGrids(storedGrids);
+	}, []);
 
 	const handleSelectWord = (word) => {
 		console.log(`Selected word: ${word.word}`);
@@ -371,6 +377,28 @@ const App = () => {
 		console.log(translatedGrid);
 	};
 
+	const handleSaveGrid = () => {
+		const gridName = prompt("Enter a name for this grid:");
+		if (gridName) {
+			const newSavedGrids = { ...savedGrids, [gridName]: grid };
+			setSavedGrids(newSavedGrids);
+			localStorage.setItem("savedGrids", JSON.stringify(newSavedGrids));
+		}
+	};
+
+	const handleLoadGrid = (gridName) => {
+		const loadedGrid = savedGrids[gridName];
+		if (loadedGrid) {
+			setGrid(loadedGrid);
+		}
+	};
+
+	const handleDeleteGrid = (gridName) => {
+		const { [gridName]: _, ...newSavedGrids } = savedGrids;
+		setSavedGrids(newSavedGrids);
+		localStorage.setItem("savedGrids", JSON.stringify(newSavedGrids));
+	};
+
 	return (
 		<div className="app">
 			<div className="grid-size-controls">
@@ -423,7 +451,20 @@ const App = () => {
 				</button>
 			</div>
 			<button onClick={handleTranslateGrid}>Translate Grid</button>
+			<button onClick={handleSaveGrid}>Save Grid</button>
 			<pre>{JSON.stringify(visualGrid, null, 2)}</pre>
+			<div className="saved-grids">
+				<h3>Saved Grids</h3>
+				<ul>
+					{Object.keys(savedGrids).map((gridName) => (
+						<li key={gridName}>
+							{gridName}{" "}
+							<button onClick={() => handleLoadGrid(gridName)}>Load</button>
+							<button onClick={() => handleDeleteGrid(gridName)}>Delete</button>
+						</li>
+					))}
+				</ul>
+			</div>
 		</div>
 	);
 };
